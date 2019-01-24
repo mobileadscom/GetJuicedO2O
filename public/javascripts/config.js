@@ -1,6 +1,6 @@
 let config = {
 	isDemo: false,
-	userAPIDomain: 'https://api.mobileads.com/coupons/goldenBowl',
+	userAPIDomain: 'https://api.mobileads.com/coupons/peony',
 	source: 'dumSource',
 	campaignLink: 'https://goldenbowl.o2oplatform.com/',
 	couponLink: 'https://goldenbowl.o2oplatform.com/coupon.html',

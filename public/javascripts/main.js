@@ -2,7 +2,6 @@ import miniPages from './miniPages'
 import config from './config'
 import user from './userCore'
 import tracker from './tracker'
-import store from './store'
 import axios from 'axios'
 
 import '../stylesheets/pageLayout.css'
@@ -24,7 +23,7 @@ var coupon = {
 		'GBP-RM15': 'RM15 Discount'
 	},
 	claim(store) {
-		return axios.post(`${config.userAPIDomain}/coupons/goldenBowl/coupon_claim?id=${user.info.id}&couponId=${this.id}&claimAt=${store}`)
+		return axios.post(`${config.userAPIDomain}/coupon_claim?id=${user.info.id}&couponId=${this.id}&claimAt=${store}`)
 	}
 }
 
@@ -67,17 +66,16 @@ var app = {
 		}
 	},
 	redeemCoupon: function() {
-		if (store.selected && user.info.id && !coupon.claiming) {
+		if (user.info.id && !coupon.claiming) {
 			coupon.claiming = true
-			store.disabled = true
 			document.getElementById('redeemLoader').style.display = 'block'
 			document.getElementById('confirmRedeem').style.display = 'none'
 			//redeem coupon api...
-			coupon.claim(store.selected).then((response) => {
+			coupon.claim('No-Store').then((response) => {
 				console.log(response)
 				if (response.data.message == 'claimed.') {
 					document.getElementById('redeemLoader').style.display = 'none'
-					this.trackEvent('redeem', store.selected, '', {couponCode: coupon.couponCode})
+					this.trackEvent('redeem', 'No-Store', '', {couponCode: coupon.couponCode})
 					this.pages.toPage('donePage')
 					this.trackPage('coupon_redeemed')
 				}
@@ -93,15 +91,9 @@ var app = {
 			alert('Fail to claim coupon. Please refresh the page and try again.')
 		}
 	},
-	storeCallback() {
-		document.getElementById('confirmRedeem').disabled = false
-		if (document.getElementById('couponSection').style.display == 'none') {
-			document.getElementById('couponSection').style.display = 'block'
-		}
-	},
 	events: function() {
 		document.getElementById('confirmRedeem').addEventListener('click', (e) => {
-			if (!e.target.disabled && store.selected) {
+			if (!e.target.disabled) {
 				this.redeemCoupon();
 			}
 			else {
@@ -176,9 +168,6 @@ var app = {
 								document.getElementById('couponEffect').style.display = 'none'
 							}
 							this.pages.toPage('instructionPage')
-							store.init(() => {
-								app.storeCallback()
-							});
 						}
 						else {
 							this.pages.toPage('joinPage')
